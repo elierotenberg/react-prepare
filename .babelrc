@@ -1,0 +1,10 @@
+{
+  "ignore": "dist/**/*",
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-runtime"
+  ],
+  "presets": [
+    "latest"
+  ]
+}
