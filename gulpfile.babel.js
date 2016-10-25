@@ -1,5 +1,7 @@
+import 'source-map-support/register';
 import babel from 'gulp-babel';
 import gulp from 'gulp';
+import sourcemaps from 'gulp-sourcemaps';
 import eslint from 'gulp-eslint';
 import mocha from 'gulp-mocha';
 import rimraf from 'rimraf';
@@ -19,11 +21,13 @@ gulp.task('clean', (cb) =>
 
 gulp.task('build', ['lint'], () =>
   gulp.src(src)
+    .pipe(sourcemaps.init())
     .pipe(babel())
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('dist'))
 );
 
-gulp.task('test', ['lint', 'build'], () =>
+gulp.task('test', ['lint', 'clean', 'build'], () =>
   gulp.src(tests, { read: false })
     .pipe(mocha())
 );

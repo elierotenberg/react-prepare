@@ -23,17 +23,15 @@ function disposeOfCompositeElementInstance(instance) {
 }
 
 async function prepareCompositeElement({ type, props }, context) {
-  let nextProps = props;
   if(isPrepared(type)) {
-    const p = getPrepare(type)(props);
-    const pValue = isThenable(p) ? await p : p;
-    if(pValue) {
-      nextProps = pValue;
+    const p = getPrepare(type)(props, context);
+    if(isThenable(p)) {
+      await p;
     }
   }
   let instance = null;
   try {
-    instance = createCompositeElementInstance({ type, props: nextProps }, context);
+    instance = createCompositeElementInstance({ type, props }, context);
     return renderCompositeElementInstance(instance, context);
   }
   finally {

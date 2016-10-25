@@ -2,7 +2,7 @@ const { describe, it } = global;
 import t from 'tcomb';
 import sinon from 'sinon';
 import equal from 'deep-equal';
-import React, { PropTypes, Component, PureComponent } from 'react';
+import React, { PropTypes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import prepared from '../prepared';
@@ -19,7 +19,7 @@ describe('prepare', () => {
     t.assert(prepareUsingProps.calledOnce, 'prepareUsingProps has been called exactly once');
     t.assert(equal(
       prepareUsingProps.getCall(0).args,
-      [{ text: 'foo' }],
+      [{ text: 'foo' }, {}],
     ), 'prepareUsingProps has been called with correct arguments');
     t.assert(doAsyncSideEffect.calledOnce, 'doAsyncSideEffect has been called exactly once');
     t.assert(equal(
@@ -66,7 +66,7 @@ describe('prepare', () => {
     t.assert(prepareUsingPropsForFirstChild.calledOnce, 'prepareUsingPropsForFirstChild has been called exactly once');
     t.assert(equal(
       prepareUsingPropsForFirstChild.getCall(0).args,
-      [{ text: 'first' }],
+      [{ text: 'first' }, {}],
     ), 'prepareUsingPropsForFirstChild has been called with correct arguments');
     t.assert(doAsyncSideEffectForFirstChild.calledOnce, 'doAsyncSideEffectForFirstChild has been called exactly once');
     t.assert(equal(
@@ -77,7 +77,7 @@ describe('prepare', () => {
     t.assert(prepareUsingPropsForSecondChild.calledOnce, 'prepareUsingPropsForSecondChild has been called exactly once');
     t.assert(equal(
       prepareUsingPropsForSecondChild.getCall(0).args,
-      [{ text: 'second' }],
+      [{ text: 'second' }, {}],
     ), 'prepareUsingPropsForSecondChild has been called with correct arguments');
     t.assert(doAsyncSideEffectForSecondChild.calledOnce, 'doAsyncSideEffectForSecondChild has been called exactly once');
     t.assert(equal(
