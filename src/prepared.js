@@ -1,4 +1,4 @@
-import { PureComponent, Component, createElement } from 'react';
+import React, { PureComponent, Component } from 'react';
 
 import { __REACT_PREPARE__ } from './constants';
 
@@ -8,7 +8,10 @@ function prepared(prepare, {
   componentWillReceiveProps = true,
 } = {}) {
   return (OriginalComponent) => {
+    const { displayName } = OriginalComponent;
     class PreparedComponent extends (pure ? PureComponent : Component) {
+      static displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
+
       componentDidMount() {
         if(componentDidMount) {
           prepare(this.props);
@@ -22,14 +25,21 @@ function prepared(prepare, {
       }
 
       render() {
-        return createElement(OriginalComponent, this.props);
+        return <OriginalComponent {...this.props} />;
       }
     }
-    const { displayName } = OriginalComponent;
-    PreparedComponent.displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
     PreparedComponent[__REACT_PREPARE__] = prepare.bind(null);
     return PreparedComponent;
   };
 }
 
+function isPrepared(CustomComponent) {
+  return typeof CustomComponent[__REACT_PREPARE__] === 'function';
+}
+
+function getPrepare(CustomComponent) {
+  return CustomComponent[__REACT_PREPARE__];
+}
+
+export { isPrepared, getPrepare };
 export default prepared;

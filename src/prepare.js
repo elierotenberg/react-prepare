@@ -2,7 +2,7 @@ import React from 'react';
 
 import isExtensionOf from './isExtensionOf';
 import isThenable from './isThenable';
-import { __REACT_PREPARE__ } from './constants';
+import { isPrepared, getPrepare } from './prepared';
 
 function createCompositeElementInstance({ type: CompositeComponent, props }, context) {
   const instance = new CompositeComponent(props, context);
@@ -23,15 +23,17 @@ function disposeOfCompositeElementInstance(instance) {
 }
 
 async function prepareCompositeElement({ type, props }, context) {
-  if(type[__REACT_PREPARE__]) {
-    const p = type[__REACT_PREPARE__].call(null, props);
-    if(isThenable(p)) {
-      await p;
+  let nextProps = props;
+  if(isPrepared(type)) {
+    const p = getPrepare(type)(props);
+    const pValue = isThenable(p) ? await p : p;
+    if(pValue) {
+      nextProps = pValue;
     }
   }
   let instance = null;
   try {
-    instance = createCompositeElementInstance({ type, props }, context);
+    instance = createCompositeElementInstance({ type, props: nextProps }, context);
     return renderCompositeElementInstance(instance, context);
   }
   finally {
@@ -49,7 +51,7 @@ async function prepareElement(element, context) {
   if(typeof type === 'string') {
     return [props.children, context];
   }
-  if(!isExtensionOf(type, React.Component)) {
+  if(!isExtensionOf(type, React.Component) && !isExtensionOf(type, React.PureComponent)) {
     return [type(props), context];
   }
   return await prepareCompositeElement(element, context);

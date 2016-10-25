@@ -5,7 +5,7 @@ import mocha from 'gulp-mocha';
 import rimraf from 'rimraf';
 
 const src = ['src/**/*.js'];
-const tests = ['dist/tests/*.spec.js'];
+const tests = ['dist/**/*.spec.js'];
 
 gulp.task('lint', () =>
   gulp.src(src)

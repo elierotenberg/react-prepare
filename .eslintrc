@@ -31,6 +31,7 @@
   },
   "parser": "babel-eslint",
   "plugins": ["babel", "react"],
+  "extends": ["plugin:react/recommended"],
   "rules": {
     /* Possible Errors */
     "comma-dangle": [1, "always-multiline"], //disallow or enforce trailing commas (recommended)

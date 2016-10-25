@@ -12,7 +12,7 @@ function isExtensionOf(A, B) {
   if(typeof A !== 'function') {
     return false;
   }
-  const protoOfA = Reflect.getPrototypeOf(A);
+  const protoOfA = Object.getPrototypeOf(A);
   if(typeof B !== 'function') {
     return protoOfA === B;
   }

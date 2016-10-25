@@ -3,6 +3,11 @@
   "version": "0.0.0-dev",
   "description": "Prepare you app state for async server-side rendering and more!",
   "main": "dist/index.js",
+  "scripts": {
+    "build": "gulp build",
+    "clean": "gulp clean",
+    "test": "gulp test"
+  },
   "repository": {
     "url": "git@github.com:elierotenberg/react-prepare",
     "type": "git"
@@ -11,10 +16,13 @@
   "license": "MIT",
   "devDependencies": {
     "babel-eslint": "^7.0.0",
+    "babel-plugin-transform-class-properties": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "babel-plugin-transform-runtime": "^6.15.0",
     "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
     "babel-register": "^6.16.3",
+    "deep-equal": "^1.0.1",
     "eslint": "^3.8.1",
     "eslint-plugin-babel": "^3.3.0",
     "eslint-plugin-react": "^6.4.1",
@@ -25,6 +33,7 @@
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "rimraf": "^2.5.4",
+    "sinon": "^1.17.6",
     "tcomb": "^3.2.15"
   },
   "peerDependencies": {

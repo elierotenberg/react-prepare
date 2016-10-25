@@ -2,9 +2,11 @@
   "ignore": "dist/**/*",
   "plugins": [
     "transform-object-rest-spread",
+    "transform-class-properties",
     "transform-runtime"
   ],
   "presets": [
-    "latest"
+    "latest",
+    "react"
   ]
 }
