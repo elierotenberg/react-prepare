@@ -12,15 +12,19 @@ function prepared(prepare, {
     class PreparedComponent extends (pure ? PureComponent : Component) {
       static displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
 
+      static contextTypes = {
+        store: React.PropTypes.object,
+      }
+
       componentDidMount() {
         if(componentDidMount) {
-          prepare(this.props);
+          prepare(this.props, this.context);
         }
       }
 
       componentWillReceiveProps(nextProps) {
         if(componentWillReceiveProps) {
-          prepare(nextProps);
+          prepare(nextProps, this.context);
         }
       }
 
