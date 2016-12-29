@@ -6,9 +6,15 @@ function prepared(prepare, {
   pure = true,
   componentDidMount = true,
   componentWillReceiveProps = true,
+  limitOfCalls = Infinity,
 } = {}) {
   return (OriginalComponent) => {
     const { displayName } = OriginalComponent;
+
+    // counter for calls of the prepare function
+    // This enables to set a limit for the amount of calls.
+    let calls = 0;
+
     class PreparedComponent extends (pure ? PureComponent : Component) {
       static displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
 
@@ -18,13 +24,23 @@ function prepared(prepare, {
 
       componentDidMount() {
         if(componentDidMount) {
-          prepare(this.props, this.context);
+          this.prepare();
         }
       }
 
       componentWillReceiveProps(nextProps) {
         if(componentWillReceiveProps) {
+          this.prepare(nextProps);
+        }
+      }
+
+      prepare(nextProps = this.props) {
+        if(calls < limitOfCalls) {
           prepare(nextProps, this.context);
+          calls = calls + 1;
+        }
+        else {
+          // do nothing
         }
       }
 
