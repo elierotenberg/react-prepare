@@ -16,10 +16,7 @@ function renderCompositeElementInstance(instance, context = {}) {
   return [instance.render(), instance.getChildContext ? instance.getChildContext() : context];
 }
 
-function disposeOfCompositeElementInstance(instance) {
-  if(instance.componentWillUnmount) {
-    instance.componentWillUnmount();
-  }
+function disposeOfCompositeElementInstance() {
 }
 
 async function prepareCompositeElement({ type, props }, context) {
