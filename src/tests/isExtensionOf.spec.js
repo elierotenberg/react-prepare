@@ -2,7 +2,7 @@ const { describe, it } = global;
 import t from 'tcomb';
 import { PureComponent, Component } from 'react';
 
-import isExtensionOf from '../isExtensionOf';
+import isExtensionOf from '../utils/isExtensionOf';
 
 describe('isExtensionOf(B, A)', () => {
   it('returns true when B extends A', () => {

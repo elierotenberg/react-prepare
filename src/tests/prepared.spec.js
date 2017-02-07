@@ -6,7 +6,7 @@ import React, { Component, PureComponent, PropTypes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import prepared, { isPrepared, getPrepare } from '../prepared';
-import isExtensionOf from '../isExtensionOf';
+import isExtensionOf from '../utils/isExtensionOf';
 
 describe('prepared', () => {
   class OriginalCompositeComponent extends Component {

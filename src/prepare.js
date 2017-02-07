@@ -1,7 +1,7 @@
 import React from 'react';
 
-import isExtensionOf from './isExtensionOf';
-import isThenable from './isThenable';
+import isExtensionOf from './utils/isExtensionOf';
+import isThenable from './utils/isThenable';
 import { isPrepared, getPrepare } from './prepared';
 
 function createCompositeElementInstance({ type: CompositeComponent, props }, context) {
@@ -55,9 +55,9 @@ async function prepareElement(element, context) {
   return await prepareCompositeElement(element, context);
 }
 
-async function prepare(element, context = {}) {
+const prepare = async (element, context = {}) => {
   const [children, childContext] = await prepareElement(element, context);
   await Promise.all(React.Children.toArray(children).map((child) => prepare(child, childContext)));
-}
+};
 
 export default prepare;

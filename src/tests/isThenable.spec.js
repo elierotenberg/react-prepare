@@ -1,7 +1,7 @@
 const { describe, it } = global;
 import t from 'tcomb';
 
-import isThenable from '../isThenable';
+import isThenable from '../utils/isThenable';
 
 describe('isThenable(p)', () => {
   it('recognizes a native Promise as thenable', () => {
