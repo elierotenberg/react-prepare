@@ -36,7 +36,7 @@ describe('React lifecycle methods', () => {
     t.assert(spyForComponentWillMount.calledOnce, '#componentWillMount() has been called once');
   });
 
-  it('renderToString doesnt call #componentWillUnmount()', () => {
+  it('renderToString doesn\'t call #componentWillUnmount()', () => {
     const spyForComponentWillMount = () => void 0;
     const spyForComponentWillUnmount = sinon.spy();
     renderToString(<CompositeComponent

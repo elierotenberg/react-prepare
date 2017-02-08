@@ -12,7 +12,7 @@ This is exactly what `react-prepare` does: it allows you to declare asynchronous
 
 #### Example with `react-redux`
 
-Lets assume you have defined an async action creator `fetchTodoItems(userName)` which performs HTTP request to your server to retrieve the todo items for a given user and stores the result in your redux state.
+Let's assume you have defined an async action creator `fetchTodoItems(userName)` which performs HTTP request to your server to retrieve the todo items for a given user and stores the result in your redux state.
 
 Your `TodoList` component definition would look like this:
 
@@ -72,9 +72,29 @@ render(<Provider store={store}>
 
 Helper to use `prepared` more simply if your side effects consists mostly of dispatching redux actions.
 
+In the body of the `sideEffect` function, you can use the `dispatch` function to dispatch redux actions, typically
+requesting data from an asynchronous source (API server, etc.).
+For example, let's assume you have defined an async action creator `fetchTodoItems(userName)` that fetches the todo-items from a REST API,
+and that you are defining a component with a `userName` prop. To decorate your component, your code would look like:
+
+```js
+class TodoItems extends React.PureComponent { ... }
+
+const DispatchedTodoItems = dispatched(
+  async ({ userName }, dispatch) => dispatch(fetchTodoItems(userName))
+)(TodoItems);
+```
+
+The decorated component will have the following behavior:
+
+- when server-side rendered using `prepare`, `sideEffect` will be run and awaited before the component is rendered; if `sideEffect` throws, `prepare` will also throw.
+- when client-side rendered, `sideEffect` will be called on `componentDidMount` and `componentWillReceiveProps`.
+
+`opts` is an optional configuration object passed directly to the underlying `prepared` decorator (see below).
+
 #### `prepared(sideEffect: async(props, context), opts)(Component)`
 
-Decorates Component so that when `prepare` is called, `sideEffect` is called (and awaited) before continuing the rendering traversal.
+Decorates `Component` so that when `prepare` is called, `sideEffect` is called (and awaited) before continuing the rendering traversal.
 
 Available `opts` is an optional configuration object:
 
@@ -85,3 +105,9 @@ Available `opts` is an optional configuration object:
 #### `async prepare(Element)`
 
 Recursively traverses the element rendering tree and awaits the side effects of components decorated with `prepared` (or `dispatched`).
+It should be used (and `await`-ed) *before* calling `renderToString` on the server. If any of the side effects throws, `prepare` will also throw.
+
+### Notes
+
+`react-prepare` tries hard to avoid object keys conflicts, but since React isn't very friendly with `Symbol`, it uses a special key for its internal use.
+The single polluted key in the components key namespace is `@__REACT_PREPARE__@`, which shouldn't be an issue.
