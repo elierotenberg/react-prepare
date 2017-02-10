@@ -1,6 +1,6 @@
 import React from 'react';
 
-import isExtensionOf from './utils/isExtensionOf';
+import isReactCompositeComponent from './utils/isReactCompositeComponent';
 import isThenable from './utils/isThenable';
 import { isPrepared, getPrepare } from './prepared';
 
@@ -46,7 +46,7 @@ async function prepareElement(element, context) {
   if(typeof type === 'string') {
     return [props.children, context];
   }
-  if(!isExtensionOf(type, React.Component) && !isExtensionOf(type, React.PureComponent)) {
+  if(!isReactCompositeComponent(type)) {
     return [type(props), context];
   }
   return await prepareCompositeElement(element, context);

@@ -6,7 +6,6 @@ import React, { Component, PureComponent, PropTypes } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import prepared, { isPrepared, getPrepare } from '../prepared';
-import isExtensionOf from '../utils/isExtensionOf';
 
 describe('prepared', () => {
   class OriginalCompositeComponent extends Component {
@@ -40,7 +39,6 @@ describe('prepared', () => {
     const PreparedCompositeComponent = prepared(prepareUsingProps, { pure: false })(OriginalCompositeComponent);
     t.assert(!isPrepared(OriginalCompositeComponent), 'OriginalComponent is not prepared');
     t.assert(isPrepared(PreparedCompositeComponent), 'PreparedComponent is prepared');
-    t.assert(isExtensionOf(PreparedCompositeComponent, Component), 'PreparedComponent extends Component');
     const prepare = getPrepare(PreparedCompositeComponent);
     t.assert(typeof prepare === 'function', 'getPrepare(PreparedCompositeComponent) is a function');
     await prepare({ text: 'foo' });
@@ -66,7 +64,6 @@ describe('prepared', () => {
     const PreparedCompositeComponent = prepared(prepareUsingProps)(OriginalCompositePureComponent);
     t.assert(!isPrepared(OriginalCompositePureComponent), 'OriginalComponent is not prepared');
     t.assert(isPrepared(PreparedCompositeComponent), 'PreparedComponent is prepared');
-    t.assert(isExtensionOf(PreparedCompositeComponent, PureComponent), 'PreparedComponent extends PureComponent');
     const prepare = getPrepare(PreparedCompositeComponent);
     t.assert(typeof prepare === 'function', 'getPrepare(PreparedCompositeComponent) is a function');
     await prepare({ text: 'foo' });
@@ -92,7 +89,6 @@ describe('prepared', () => {
     const PreparedCompositeComponent = prepared(prepareUsingProps)(OriginalArrowComponent);
     t.assert(!isPrepared(OriginalArrowComponent), 'OriginalComponent is not prepared');
     t.assert(isPrepared(PreparedCompositeComponent), 'PreparedComponent is prepared');
-    t.assert(isExtensionOf(PreparedCompositeComponent, PureComponent), 'PreparedComponent extends PureComponent');
     const prepare = getPrepare(PreparedCompositeComponent);
     t.assert(typeof prepare === 'function', 'getPrepare(PreparedCompositeComponent) is a function');
     await prepare({ text: 'foo' });
