@@ -6,10 +6,14 @@ const prepared = (prepare, {
   pure = true,
   componentDidMount = true,
   componentWillReceiveProps = true,
+  contextTypes = {},
 } = {}) => (OriginalComponent) => {
   const { displayName } = OriginalComponent;
   class PreparedComponent extends (pure ? PureComponent : Component) {
     static displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
+
+    // Placeholder to allow referencing this.context in lifecycle methods
+    static contextTypes = contextTypes;
 
     componentDidMount() {
       if(componentDidMount) {
