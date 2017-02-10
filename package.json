@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "node_modules/.bin/rimraf dist",
     "lint": "node_modules/.bin/eslint src/**/*.js",
-    "build": "node_modules/.bin/babel src -d dist",
+    "build": "node_modules/.bin/babel src -d dist --source-maps",
     "test": "node_modules/.bin/mocha --compilers js:babel-register src/**/*.spec.js",
     "make": "yarn run lint && yarn run clean && yarn run build && yarn run test"
   },
