@@ -13,7 +13,8 @@ function createCompositeElementInstance({ type: CompositeComponent, props }, con
 }
 
 function renderCompositeElementInstance(instance, context = {}) {
-  return [instance.render(), instance.getChildContext ? instance.getChildContext() : context];
+  const childContext = Object.assign({}, context, instance.getChildContext ? instance.getChildContext() : {});
+  return [instance.render(), childContext];
 }
 
 function disposeOfCompositeElementInstance() {
