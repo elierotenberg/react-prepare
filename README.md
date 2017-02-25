@@ -19,18 +19,20 @@ Your `TodoList` component definition would look like this:
 ```js
 import { dispatched } from 'react-prepare';
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import { fetchTodoItems } from './actions';
+
+const enhance = compose(
+  dispatched(({ userName }, dispatch) => dispatch(fetchTodoItems(userName))),
+  connect(({ todoItems }) => ({ items: todoItems }),
+);
 
 const TodoList = ({ items }) => <ul>{items.map((item, key) =>
   <li key={key}>{item}</li>
 </ul>}</ul>;
 
-export default dispatched({ userName }, (dispatch) => dispatch(fetchTodoItems(userName)))(
-  connect(({ todoItems }) => ({ items: todoItems })(
-    TodoList,
-  ),
-);
+export default enhance(TodoList);
 ```
 
 And your server-side rendering code would look like this:
@@ -66,7 +68,7 @@ render(<Provider store={store}>
 </Provider>, document.getElementById('app'));
 ```
 
-**For a complete example of a fully-functional app using `react-prepare` in conjunction with `redux`, see the [react-prepare-todo](https://github.com/elierotenberg/react-prepare-todo) repository.** 
+**For a complete example of a fully-functional app using `react-prepare` in conjunction with `redux`, see the [react-prepare-todo](https://github.com/elierotenberg/react-prepare-todo) repository.**
 
 ### API
 
@@ -83,7 +85,7 @@ and that you are defining a component with a `userName` prop. To decorate your c
 class TodoItems extends React.PureComponent { ... }
 
 const DispatchedTodoItems = dispatched(
-  async ({ userName }, dispatch) => dispatch(fetchTodoItems(userName))
+  ({ userName }, dispatch) => dispatch(fetchTodoItems(userName))
 )(TodoItems);
 ```
 
