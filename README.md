@@ -66,6 +66,8 @@ render(<Provider store={store}>
 </Provider>, document.getElementById('app'));
 ```
 
+**For a complete example of a fully-functional app using `react-prepare` in conjunction with `redux`, see the [react-prepare-todo](https://github.com/elierotenberg/react-prepare-todo) repository.** 
+
 ### API
 
 #### `dispatched(sideEffect: async(props, dispatch), opts)(Component)`
