@@ -17,45 +17,41 @@ function renderCompositeElementInstance(instance, context = {}) {
   return [instance.render(), childContext];
 }
 
-function disposeOfCompositeElementInstance() {
-}
-
 async function prepareCompositeElement({ type, props }, context) {
   if(isPrepared(type)) {
     const p = getPrepare(type)(props, context);
     if(isThenable(p)) {
       await p;
     }
-  }
-  let instance = null;
-  try {
-    instance = createCompositeElementInstance({ type, props }, context);
-    return renderCompositeElementInstance(instance, context);
-  }
-  finally {
-    if(instance !== null) {
-      disposeOfCompositeElementInstance(instance);
+    else {
+      await Promise.resolve();
     }
   }
+  else {
+    await Promise.resolve();
+  }
+  const instance = createCompositeElementInstance({ type, props }, context);
+  return renderCompositeElementInstance(instance, context);
 }
 
-async function prepareElement(element, context) {
+function prepareElement(element, context) {
   if(element === null || typeof element !== 'object') {
-    return [null, context];
+    return Promise.resolve([null, context]);
   }
   const { type, props } = element;
   if(typeof type === 'string') {
-    return [props.children, context];
+    return Promise.resolve([props.children, context]);
   }
   if(!isReactCompositeComponent(type)) {
-    return [type(props), context];
+    return Promise.resolve([type(props), context]);
   }
-  return await prepareCompositeElement(element, context);
+  return prepareCompositeElement(element, context);
 }
 
-const prepare = async (element, context = {}) => {
-  const [children, childContext] = await prepareElement(element, context);
-  await Promise.all(React.Children.toArray(children).map((child) => prepare(child, childContext)));
-};
+function prepare(element, context = {}) {
+  return prepareElement(element, context).then(([children, childContext]) =>
+    Promise.all(React.Children.toArray(children).map((child) => prepare(child, childContext)))
+  );
+}
 
 export default prepare;
