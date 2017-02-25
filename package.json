@@ -1,6 +1,6 @@
 {
   "name": "react-prepare",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Prepare you app state for async server-side rendering and more!",
   "main": "dist/index.js",
   "scripts": {
