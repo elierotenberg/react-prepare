@@ -21,9 +21,9 @@ const prepared = (prepare, {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps, nextContext) {
       if(componentWillReceiveProps) {
-        prepare(nextProps, this.context);
+        prepare(nextProps, nextContext);
       }
     }
 
