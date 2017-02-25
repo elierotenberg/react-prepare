@@ -1,3 +1,4 @@
+// @flow
 const { describe, it } = global;
 import t from 'tcomb';
 import React from 'react';
@@ -26,7 +27,10 @@ describe('isReactCompositeComponent', () => {
 
   it('should not match functional component', () => {
     const C = () => <div />;
-    t.assert(isReactCompositeComponent(C) === false, 'not match functional component');
+    t.assert(
+      isReactCompositeComponent(C) === false,
+      'not match functional component',
+    );
   });
 
   it('should match redux Provider', () => {

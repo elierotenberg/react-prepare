@@ -1,3 +1,4 @@
+// @flow
 const { describe, it } = global;
 import t from 'tcomb';
 
