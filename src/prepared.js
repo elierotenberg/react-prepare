@@ -25,7 +25,16 @@ const prepared = (
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
-      if (componentWillReceiveProps) {
+      if (
+        (typeof componentWillReceiveProps === 'function' &&
+          componentWillReceiveProps(
+            this.props,
+            nextProps,
+            this.context,
+            nextContext,
+          )) ||
+        componentWillReceiveProps
+      ) {
         prepare(nextProps, nextContext);
       }
     }
