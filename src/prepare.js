@@ -4,8 +4,31 @@ import isReactCompositeComponent from './utils/isReactCompositeComponent';
 import isThenable from './utils/isThenable';
 import { isPrepared, getPrepare } from './prepared';
 
+const updater = {
+  enqueueSetState(publicInstance, partialState, callback) {
+    let newState = partialState;
+    if (typeof partialState === 'function') {
+      newState = partialState(publicInstance.state, publicInstance.props);
+    }
+
+    publicInstance.state = Object.assign({}, publicInstance.state, newState);
+    if (typeof callback === 'function') {
+      callback();
+      return;
+    }
+  },
+};
+
 function createCompositeElementInstance({ type: CompositeComponent, props }, context) {
   const instance = new CompositeComponent(props, context);
+  const state = instance.state || null;
+
+  instance.props = props;
+  instance.state = state;
+  instance.context = context;
+  instance.updater = updater;
+  instance.refs = {};
+
   if(instance.componentWillMount) {
     instance.componentWillMount();
   }

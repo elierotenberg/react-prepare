@@ -9,6 +9,55 @@ import prepared from '../prepared';
 import prepare from '../prepare';
 
 describe('prepare', () => {
+  it('sets instance properties', async () => {
+    class MessageBox extends React.Component {
+      static propTypes = {
+        message: PropTypes.string,
+      }
+
+      constructor() {
+        super();
+      }
+
+      render() {
+        t.assert(equal(this.props, { message: 'Hello' }), 'sets props on instance');
+        t.assert(this.state === null, 'sets state on instance');
+        t.assert(this.updater !== undefined, 'sets updater on instance'); // eslint-disable-line no-undefined
+        t.assert(equal(this.refs, {}), 'sets refs on instance');
+        t.assert(equal(this.context, {}), 'sets context on instance');
+        return null;
+      }
+    }
+
+    renderToStaticMarkup(<MessageBox message='Hello' />);
+
+    await prepare(<MessageBox message='Hello' />);
+  });
+
+  it('supports state updates inside componentWillMount', async () => {
+    class MessageBox extends React.Component {
+      constructor() {
+        super();
+        this.state = {
+          message: 'Hello',
+        };
+      }
+
+      componentWillMount() {
+        this.setState({ message: 'Updated message' });
+      }
+
+      render() {
+        t.assert(equal(this.state.message, 'Updated message'), 'updates state on instance');
+        return null;
+      }
+    }
+
+    renderToStaticMarkup(<MessageBox />);
+
+    await prepare(<MessageBox />);
+  });
+
   it('Shallow hierarchy (no children)', async () => {
     const doAsyncSideEffect = sinon.spy(async () => {});
     const prepareUsingProps = sinon.spy(async ({ text }) => {
