@@ -1,7 +1,8 @@
 const { describe, it } = global;
 import url from 'url';
 import t from 'tcomb';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';

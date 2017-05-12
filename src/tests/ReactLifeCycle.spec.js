@@ -1,5 +1,6 @@
 const { describe, it } = global;
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { renderToString } from 'react-dom/server';
 import sinon from 'sinon';
 import t from 'tcomb';
