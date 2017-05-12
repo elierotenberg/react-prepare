@@ -32,6 +32,7 @@
     "koa": "^1.2.4",
     "mocha": "^3.2.0",
     "node-fetch": "^1.6.3",
+    "prop-types": "^15.5.9",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
