@@ -1,7 +1,8 @@
 const { describe, it } = global;
 import url from 'url';
 import t from 'tcomb';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
@@ -19,7 +20,6 @@ const HTTP_STATUS_OK_BOUNDS = {
 
 describe('dispatched', () => {
   it('Real-world-like example using redux, koa, et. al', async () => {
-
     // Create a fake echo server that replies with the pathname, preceded by 'echo '.
     const echoServer = koa().use(function* echo(next) {
       this.response.body = `echo ${this.request.path}`;
@@ -39,7 +39,7 @@ describe('dispatched', () => {
       const FETCH_SUCCEEDED = 'FETCH_SUCCEEDED';
 
       const rootReducer = (state = {}, { type, ...payload }) => {
-        if(type === FETCH_STARTED) {
+        if (type === FETCH_STARTED) {
           const { into } = payload;
           return Object.assign({}, state, {
             [into]: {
@@ -47,7 +47,7 @@ describe('dispatched', () => {
             },
           });
         }
-        if(type === FETCH_FAILED) {
+        if (type === FETCH_FAILED) {
           const { into, statusCode, err } = payload;
           return Object.assign({}, state, {
             [into]: {
@@ -57,7 +57,7 @@ describe('dispatched', () => {
             },
           });
         }
-        if(type === FETCH_SUCCEEDED) {
+        if (type === FETCH_SUCCEEDED) {
           const { into, value } = payload;
           return Object.assign({}, state, {
             [into]: {
@@ -70,15 +70,10 @@ describe('dispatched', () => {
       };
 
       // redux store used by the app
-      const store = createStore(
-        rootReducer,
-        applyMiddleware(
-          thunkMiddleware,
-        ),
-      );
+      const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
 
       // async action creator
-      const fetchInto = (pathname, into) => async (dispatch) => {
+      const fetchInto = (pathname, into) => async dispatch => {
         dispatch({
           type: FETCH_STARTED,
           into,
@@ -86,7 +81,10 @@ describe('dispatched', () => {
         const href = url.format(Object.assign({}, baseUrlObj, { pathname }));
         try {
           const res = await fetch(href);
-          if(res.status < HTTP_STATUS_OK_BOUNDS.min || res.status >= HTTP_STATUS_OK_BOUNDS.max) {
+          if (
+            res.status < HTTP_STATUS_OK_BOUNDS.min ||
+            res.status >= HTTP_STATUS_OK_BOUNDS.max
+          ) {
             dispatch({
               type: FETCH_FAILED,
               into,
@@ -101,8 +99,7 @@ describe('dispatched', () => {
             value: await res.text(),
           });
           return;
-        }
-        catch(err) {
+        } catch (err) {
           dispatch({
             type: FETCH_FAILED,
             into,
@@ -113,14 +110,14 @@ describe('dispatched', () => {
       };
 
       const OriginalEchoAlpha = ({ alpha }) => {
-        if(typeof alpha !== 'object') {
+        if (typeof alpha !== 'object') {
           return <div>???</div>;
         }
         const { status, err, value } = alpha;
-        if(status === FETCH_STARTED) {
+        if (status === FETCH_STARTED) {
           return <div>...</div>;
         }
-        if(status === FETCH_FAILED) {
+        if (status === FETCH_FAILED) {
           return <div>Error fetching beta (Reason: {err})</div>;
         }
         return <div>{value}</div>;
@@ -129,19 +126,23 @@ describe('dispatched', () => {
         alpha: PropTypes.object,
       };
 
-      const ConnectedEchoAlpha = connect(({ alpha }) => ({ alpha }))(OriginalEchoAlpha);
+      const ConnectedEchoAlpha = connect(({ alpha }) => ({ alpha }))(
+        OriginalEchoAlpha,
+      );
 
-      const EchoAlpha = dispatched(({ value }, dispatch) => dispatch(fetchInto(value, 'alpha')))(ConnectedEchoAlpha);
+      const EchoAlpha = dispatched(({ value }, dispatch) =>
+        dispatch(fetchInto(value, 'alpha')),
+      )(ConnectedEchoAlpha);
 
       const OriginalEchoBeta = ({ beta }) => {
-        if(typeof beta !== 'object') {
+        if (typeof beta !== 'object') {
           return <div>???</div>;
         }
         const { status, err, value } = beta;
-        if(status === FETCH_STARTED) {
+        if (status === FETCH_STARTED) {
           return <div>...</div>;
         }
-        if(status === FETCH_FAILED) {
+        if (status === FETCH_FAILED) {
           return <div>Error fetching beta (Reason: {err})</div>;
         }
         return <div>{value}</div>;
@@ -150,22 +151,31 @@ describe('dispatched', () => {
         beta: PropTypes.object,
       };
 
-      const ConnectedEchoBeta = connect(({ beta }) => ({ beta }))(OriginalEchoBeta);
+      const ConnectedEchoBeta = connect(({ beta }) => ({ beta }))(
+        OriginalEchoBeta,
+      );
 
-      const EchoBeta = dispatched(({ value }, dispatch) => dispatch(fetchInto(value, 'beta')))(ConnectedEchoBeta);
+      const EchoBeta = dispatched(({ value }, dispatch) =>
+        dispatch(fetchInto(value, 'beta')),
+      )(ConnectedEchoBeta);
 
-      const App = () => <ul>
-        <li key='alpha'><EchoAlpha value='foo' /></li>
-        <li key='beta'><EchoBeta value='bar' /></li>
-      </ul>;
+      const App = () => (
+        <ul>
+          <li key="alpha"><EchoAlpha value="foo" /></li>
+          <li key="beta"><EchoBeta value="bar" /></li>
+        </ul>
+      );
 
       const app = <Provider store={store}><App /></Provider>;
 
       await prepare(app);
       const html = renderToStaticMarkup(app);
-      t.assert(html === '<ul><li><div>echo /foo</div></li><li><div>echo /bar</div></li></ul>', 'renders correct html');
-    }
-    finally {
+      t.assert(
+        html ===
+          '<ul><li><div>echo /foo</div></li><li><div>echo /bar</div></li></ul>',
+        'renders correct html',
+      );
+    } finally {
       echoHttpServer.close();
     }
   });
