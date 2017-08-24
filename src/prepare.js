@@ -6,10 +6,9 @@ import { isPrepared, getPrepare } from './prepared';
 
 const updater = {
   enqueueSetState(publicInstance, partialState, callback) {
-    let newState = partialState;
-    if (typeof partialState === 'function') {
-      newState = partialState(publicInstance.state, publicInstance.props);
-    }
+    const newState = typeof partialState === 'function'
+      ? partialState(publicInstance.state, publicInstance.props)
+      : partialState;
 
     publicInstance.state = Object.assign({}, publicInstance.state, newState);
     if (typeof callback === 'function') {
@@ -19,7 +18,10 @@ const updater = {
   },
 };
 
-function createCompositeElementInstance({ type: CompositeComponent, props }, context) {
+function createCompositeElementInstance(
+  { type: CompositeComponent, props },
+  context,
+) {
   const instance = new CompositeComponent(props, context);
   const state = instance.state || null;
 
@@ -29,7 +31,7 @@ function createCompositeElementInstance({ type: CompositeComponent, props }, con
   instance.updater = updater;
   instance.refs = {};
 
-  if(instance.componentWillMount) {
+  if (instance.componentWillMount) {
     instance.componentWillMount();
   }
   return instance;

@@ -14,14 +14,17 @@ describe('prepare', () => {
     class MessageBox extends React.Component {
       static propTypes = {
         message: PropTypes.string,
-      }
+      };
 
       constructor() {
         super();
       }
 
       render() {
-        t.assert(equal(this.props, { message: 'Hello' }), 'sets props on instance');
+        t.assert(
+          equal(this.props, { message: 'Hello' }),
+          'sets props on instance',
+        );
         t.assert(this.state === null, 'sets state on instance');
         t.assert(this.updater !== undefined, 'sets updater on instance'); // eslint-disable-line no-undefined
         t.assert(equal(this.refs, {}), 'sets refs on instance');
@@ -30,9 +33,9 @@ describe('prepare', () => {
       }
     }
 
-    renderToStaticMarkup(<MessageBox message='Hello' />);
+    renderToStaticMarkup(<MessageBox message="Hello" />);
 
-    await prepare(<MessageBox message='Hello' />);
+    await prepare(<MessageBox message="Hello" />);
   });
 
   it('supports state updates inside componentWillMount', async () => {
@@ -49,7 +52,10 @@ describe('prepare', () => {
       }
 
       render() {
-        t.assert(equal(this.state.message, 'Updated message'), 'updates state on instance');
+        t.assert(
+          equal(this.state.message, 'Updated message'),
+          'updates state on instance',
+        );
         return null;
       }
     }
