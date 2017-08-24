@@ -2,12 +2,15 @@ import React, { PureComponent, Component } from 'react';
 
 import { __REACT_PREPARE__ } from './constants';
 
-const prepared = (prepare, {
-  pure = true,
-  componentDidMount = true,
-  componentWillReceiveProps = true,
-  contextTypes = {},
-} = {}) => (OriginalComponent) => {
+const prepared = (
+  prepare,
+  {
+    pure = true,
+    componentDidMount = true,
+    componentWillReceiveProps = true,
+    contextTypes = {},
+  } = {},
+) => OriginalComponent => {
   const { displayName } = OriginalComponent;
   class PreparedComponent extends (pure ? PureComponent : Component) {
     static displayName = `PreparedComponent${displayName ? `(${displayName})` : ''}`;
@@ -16,13 +19,13 @@ const prepared = (prepare, {
     static contextTypes = contextTypes;
 
     componentDidMount() {
-      if(componentDidMount) {
+      if (componentDidMount) {
         prepare(this.props, this.context);
       }
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
-      if(componentWillReceiveProps) {
+      if (componentWillReceiveProps) {
         prepare(nextProps, nextContext);
       }
     }
