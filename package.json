@@ -1,6 +1,6 @@
 {
   "name": "@webkom/react-prepare",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Prepare you app state for async server-side rendering and more!",
   "main": "dist/index.js",
   "scripts": {
