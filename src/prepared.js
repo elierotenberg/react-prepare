@@ -26,14 +26,14 @@ const prepared = (
 
     componentWillReceiveProps(nextProps, nextContext) {
       if (
-        (typeof componentWillReceiveProps === 'function' &&
-          componentWillReceiveProps(
-            this.props,
-            nextProps,
-            this.context,
-            nextContext,
-          )) ||
-        componentWillReceiveProps
+        typeof componentWillReceiveProps === 'function'
+          ? componentWillReceiveProps(
+              this.props,
+              nextProps,
+              this.context,
+              nextContext,
+            )
+          : componentWillReceiveProps
       ) {
         prepare(nextProps, nextContext);
       }
