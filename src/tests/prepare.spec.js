@@ -5,7 +5,6 @@ import equal from 'deep-equal';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
-
 import prepared from '../prepared';
 import prepare from '../prepare';
 
@@ -65,6 +64,80 @@ describe('prepare', () => {
     await prepare(<MessageBox />);
   });
 
+  it('Should throw exception', async () => {
+    const doAsyncSideEffect = sinon.spy(async () => {
+      throw new Error('Err');
+    });
+    const prepareUsingProps = async ({ text }) => {
+      await doAsyncSideEffect(text);
+    };
+    const App = prepared(prepareUsingProps)(({ text }) => <div>{text}</div>);
+    try {
+      await prepare(
+        <App text="foo">
+          <App text="foo" />
+          <App text="foo" />
+          <App text="foo" />
+          <App text="foo" />
+        </App>,
+      );
+    } catch (err) {
+      t.assert(doAsyncSideEffect.calledOnce, 'Should be called once times');
+      return;
+    }
+    t.assert(false, 'It should throw');
+  });
+
+  it("Should be possible to don't throw exception", async () => {
+    const doAsyncSideEffect = sinon.spy(async () => {
+      throw new Error('Errooor');
+    });
+
+    const prepareUsingProps = async ({ text }) => {
+      await doAsyncSideEffect(text);
+    };
+    const options = { errorHandler: e => e };
+
+    const App = prepared(prepareUsingProps)(({ text, children }) => (
+      <div>
+        {text} <div>{children ? children : null}</div>
+      </div>
+    ));
+    await prepare(
+      <App text="foo">
+        <App text="foo" />
+        <App text="foo" />
+      </App>,
+      options,
+    );
+    t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
+  });
+
+  it("Should be possible to don't throw exception", async () => {
+    const doAsyncSideEffect = sinon.spy(async () => {
+      throw new Error('Errooor');
+    });
+
+    const prepareUsingProps = async ({ text }) => {
+      await doAsyncSideEffect(text);
+    };
+    const options = { errorHandler: e => e };
+
+    const App = prepared(prepareUsingProps)(({ text, children }) => (
+      <div>
+        {text} <div>{children ? children : null}</div>
+      </div>
+    ));
+    await prepare(
+      <App text="foo">
+        <App text="foo" />
+        <App text="foo" />
+      </App>,
+      options,
+    );
+    t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
+  });
+
   it('Shallow hierarchy (no children)', async () => {
     const doAsyncSideEffect = sinon.spy(async () => {});
     const prepareUsingProps = sinon.spy(async ({ text }) => {
@@ -117,8 +190,12 @@ describe('prepare', () => {
 
     const App = ({ texts }) => (
       <ul>
-        <li key={0}><FirstChild text={texts[0]} /></li>
-        <li key={1}><SecondChild text={texts[1]} /></li>
+        <li key={0}>
+          <FirstChild text={texts[0]} />
+        </li>
+        <li key={1}>
+          <SecondChild text={texts[1]} />
+        </li>
       </ul>
     );
     App.propTypes = {
