@@ -106,10 +106,17 @@ Available `opts` is an optional configuration object:
 - `opts.componentDidMount` (default: `true`): on the client, `sideEffect` is called when the component is mounted.
 - `opts.componentWillReceiveProps` (default: `true`): on the client, `sideEffect` is called again whenever the component receive props.
 
-#### `async prepare(Element)`
+#### `async prepare(Element, ?opts)`
 
 Recursively traverses the element rendering tree and awaits the side effects of components decorated with `prepared` (or `dispatched`).
 It should be used (and `await`-ed) *before* calling `renderToString` on the server. If any of the side effects throws, `prepare` will also throw.
+
+`opts` is an optional configuration object.
+
+Available `opts` is an optional configuration object:
+
+- `opts.errorHandler` (default: `e => {throw e}`): Custom error handler used by each `sideEffect`. If a `sideEffect` throws, this is used as an error handler. If
+the error handler then throws, the `prepare`.
 
 ### Notes
 

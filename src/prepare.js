@@ -46,9 +46,9 @@ function renderCompositeElementInstance(instance, context = {}) {
   return [instance.render(), childContext];
 }
 
-async function prepareCompositeElement({ type, props }, context) {
+async function prepareCompositeElement({ type, props }, errorHandler, context) {
   if (isPrepared(type)) {
-    const p = getPrepare(type)(props, context);
+    const p = getPrepare(type)(props, context).catch(errorHandler);
     if (isThenable(p)) {
       await p;
     } else {
@@ -61,7 +61,7 @@ async function prepareCompositeElement({ type, props }, context) {
   return renderCompositeElementInstance(instance, context);
 }
 
-function prepareElement(element, context) {
+function prepareElement(element, errorHandler, context) {
   if (element === null || typeof element !== 'object') {
     return Promise.resolve([null, context]);
   }
@@ -72,15 +72,24 @@ function prepareElement(element, context) {
   if (!isReactCompositeComponent(type)) {
     return Promise.resolve([type(props), context]);
   }
-  return prepareCompositeElement(element, context);
+  return prepareCompositeElement(element, errorHandler, context);
 }
 
-function prepare(element, context = {}) {
-  return prepareElement(element, context).then(([children, childContext]) =>
+function prepare(element, options = {}, context = {}) {
+  const {
+    errorHandler = error => {
+      throw error;
+    },
+  } = options;
+  return prepareElement(
+    element,
+    errorHandler,
+    context,
+  ).then(([children, childContext]) =>
     Promise.all(
       React.Children
         .toArray(children)
-        .map(child => prepare(child, childContext)),
+        .map(child => prepare(child, options, childContext)),
     ),
   );
 }
