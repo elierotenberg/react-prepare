@@ -70,7 +70,7 @@ function prepareElement(element, context) {
     return Promise.resolve([props.children, context]);
   }
   if (!isReactCompositeComponent(type)) {
-    return Promise.resolve([type(props), context]);
+    return Promise.resolve([type(props, context), context]);
   }
   return prepareCompositeElement(element, context);
 }
