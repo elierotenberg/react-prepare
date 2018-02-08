@@ -66,7 +66,10 @@ function prepareElement(element, context) {
     return Promise.resolve([null, context]);
   }
   const { type, props } = element;
-  if (typeof type === 'string') {
+  // React.Fragment can be either a symbol or number based on the existence of
+  // ES2015 Symbol support of the current runtime environment. An equality
+  // comparison works for both cases.
+  if (typeof type === 'string' || type === React.Fragment) {
     return Promise.resolve([props.children, context]);
   }
   if (!isReactCompositeComponent(type)) {
