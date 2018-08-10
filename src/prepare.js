@@ -48,9 +48,9 @@ function renderCompositeElementInstance(instance, context = {}) {
 
 async function prepareCompositeElement({ type, props }, errorHandler, context) {
   if (isPrepared(type)) {
-    const p = getPrepare(type)(props, context).catch(errorHandler);
+    const p = getPrepare(type)(props, context);
     if (isThenable(p)) {
-      await p;
+      await p.catch(errorHandler);
     } else {
       await Promise.resolve();
     }

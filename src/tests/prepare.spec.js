@@ -128,10 +128,15 @@ describe('prepare', () => {
         {text} <div>{children ? children : null}</div>
       </div>
     ));
+    /* eslint-disable react/prop-types */
+    const Testing = ({ children }) => <div>Test {children} </div>;
+    /* eslint-enable react/prop-types */
     await prepare(
       <App text="foo">
         <App text="foo" />
-        <App text="foo" />
+        <Testing>
+          <App text="foo" />
+        </Testing>
       </App>,
       options,
     );
