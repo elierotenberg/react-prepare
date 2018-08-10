@@ -66,7 +66,7 @@ function prepareElement(element, errorHandler, context) {
     return Promise.resolve([null, context]);
   }
   const { type, props } = element;
-  if (typeof type === 'string') {
+  if (typeof type === 'string' || typeof type === 'symbol') {
     return Promise.resolve([props.children, context]);
   }
   if (!isReactCompositeComponent(type)) {

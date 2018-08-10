@@ -138,6 +138,32 @@ describe('prepare', () => {
     t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
   });
 
+  it('Should support <React.Fragment />', async () => {
+    const doAsyncSideEffect = sinon.spy(async () => {});
+    const prepareUsingProps = sinon.spy(async ({ text }) => {
+      await doAsyncSideEffect(text);
+    });
+    const App = prepared(prepareUsingProps)(({ text }) => <div>{text}</div>);
+    await prepare(
+      <React.Fragment>
+        <App text="foo" />
+        <App text="foo" />
+        inline
+      </React.Fragment>,
+    );
+
+    t.assert(
+      prepareUsingProps.calledTwice,
+      'prepareUsingProps has been called twice',
+    );
+    t.assert(
+      doAsyncSideEffect.calledTwice,
+      'doAsyncSideEffect has been called twice',
+    );
+    const html = renderToStaticMarkup(<App text="foo" />);
+    t.assert(html === '<div>foo</div>', 'renders with correct html');
+  });
+
   it('Shallow hierarchy (no children)', async () => {
     const doAsyncSideEffect = sinon.spy(async () => {});
     const prepareUsingProps = sinon.spy(async ({ text }) => {
