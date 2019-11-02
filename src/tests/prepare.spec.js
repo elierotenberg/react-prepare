@@ -2,7 +2,7 @@ const { describe, it } = global;
 import t from 'tcomb';
 import sinon from 'sinon';
 import equal from 'deep-equal';
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import prepared from '../prepared';
@@ -167,6 +167,51 @@ describe('prepare', () => {
     );
     const html = renderToStaticMarkup(<App text="foo" />);
     t.assert(html === '<div>foo</div>', 'renders with correct html');
+  });
+  it('Should support React Contexts />', async () => {
+    const MyContext = React.createContext('initial');
+    const Func = sinon.spy(() => null);
+    const AnotherContext = React.createContext();
+    const App = () => (
+      <MyContext.Consumer>
+        {data => (
+          <React.Fragment>
+            {data}{' '}
+            <MyContext.Provider value="testing">
+              <MyContext.Consumer>
+                {Func}
+              </MyContext.Consumer>
+              <MyContext.Consumer>
+                {internal => <React.Fragment>{internal}{' '}</React.Fragment>}
+              </MyContext.Consumer>
+            </MyContext.Provider>
+            <MyContext.Consumer>
+              {internal => <React.Fragment>{internal}{' '}</React.Fragment>}
+            </MyContext.Consumer>
+            <AnotherContext.Consumer>
+              {internal => <React.Fragment>{internal}</React.Fragment>}
+            </AnotherContext.Consumer>
+            <AnotherContext.Provider value="another">
+              <AnotherContext.Consumer>
+                {internal => <React.Fragment>{internal}</React.Fragment>}
+              </AnotherContext.Consumer>
+            </AnotherContext.Provider>
+          </React.Fragment>
+        )}
+      </MyContext.Consumer>
+    );
+    await prepare(<App />);
+    t.assert(Func.calledOnce, 'Func has been called exactly once');
+    t.assert(
+      equal(Func.getCall(0).args, ['testing']),
+      'Func should be called with testing as arg',
+    );
+
+    const html = renderToStaticMarkup(<App />);
+    t.assert(
+      html === 'initial testing initial another',
+      'renders with correct html',
+    );
   });
 
   it('Shallow hierarchy (no children)', async () => {
