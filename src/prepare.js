@@ -75,9 +75,9 @@ function prepareElement(element, errorHandler, context) {
     typeof type === 'object' &&
     type.$$typeof.toString() === 'Symbol(react.provider)'
   ) {
-    const map = new Map(context && context._providers);
-    map.set(type._context.Provider, props);
-    return Promise.resolve([props.children, { ...context, _providers: map }]);
+    const _providers = new Map(context._providers);
+    _providers.set(type._context.Provider, props);
+    return Promise.resolve([props.children, { ...context, _providers }]);
   }
 
   if (
