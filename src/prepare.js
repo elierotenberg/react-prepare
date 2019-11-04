@@ -66,9 +66,34 @@ function prepareElement(element, errorHandler, context) {
     return Promise.resolve([null, context]);
   }
   const { type, props } = element;
+
   if (typeof type === 'string' || typeof type === 'symbol') {
     return Promise.resolve([props.children, context]);
   }
+
+  if (
+    typeof type === 'object' &&
+    type.$$typeof.toString() === 'Symbol(react.provider)'
+  ) {
+    const _providers = new Map(context._providers);
+    _providers.set(type._context.Provider, props);
+    return Promise.resolve([props.children, { ...context, _providers }]);
+  }
+
+  if (
+    typeof type === 'object' &&
+    type.$$typeof.toString() === 'Symbol(react.context)'
+  ) {
+    const parentProvider =
+      context._providers && context._providers.get(type._context.Provider);
+    const value = parentProvider
+      ? parentProvider.value
+      : type._context.currentValue;
+
+    const consumerFunc = props.children;
+    return Promise.resolve([consumerFunc(value), context]);
+  }
+
   if (!isReactCompositeComponent(type)) {
     return Promise.resolve([type(props), context]);
   }
