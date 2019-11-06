@@ -1,26 +1,26 @@
-import React from 'react';
+import React from "react";
 
-import isReactCompositeComponent from './utils/isReactCompositeComponent';
-import isThenable from './utils/isThenable';
-import { isPrepared, getPrepare } from './prepared';
+import isReactCompositeComponent from "./utils/isReactCompositeComponent";
+import isThenable from "./utils/isThenable";
+import { isPrepared, getPrepare } from "./prepared";
 
 const updater = {
   enqueueSetState(publicInstance, partialState, callback) {
-    const newState = typeof partialState === 'function'
+    const newState = typeof partialState === "function"
       ? partialState(publicInstance.state, publicInstance.props)
       : partialState;
 
     publicInstance.state = Object.assign({}, publicInstance.state, newState);
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       callback();
       return;
     }
-  },
+  }
 };
 
 function createCompositeElementInstance(
   { type: CompositeComponent, props },
-  context,
+  context
 ) {
   const instance = new CompositeComponent(props, context);
   const state = instance.state || null;
@@ -41,7 +41,7 @@ function renderCompositeElementInstance(instance, context = {}) {
   const childContext = Object.assign(
     {},
     context,
-    instance.getChildContext ? instance.getChildContext() : {},
+    instance.getChildContext ? instance.getChildContext() : {}
   );
   return [instance.render(), childContext];
 }
@@ -62,18 +62,18 @@ async function prepareCompositeElement({ type, props }, errorHandler, context) {
 }
 
 function prepareElement(element, errorHandler, context) {
-  if (element === null || typeof element !== 'object') {
+  if (element === null || typeof element !== "object") {
     return Promise.resolve([null, context]);
   }
   const { type, props } = element;
 
-  if (typeof type === 'string' || typeof type === 'symbol') {
+  if (typeof type === "string" || typeof type === "symbol") {
     return Promise.resolve([props.children, context]);
   }
 
   if (
-    typeof type === 'object' &&
-    type.$$typeof.toString() === 'Symbol(react.provider)'
+    typeof type === "object" &&
+    type.$$typeof.toString() === "Symbol(react.provider)"
   ) {
     const _providers = new Map(context._providers);
     _providers.set(type._context.Provider, props);
@@ -81,8 +81,8 @@ function prepareElement(element, errorHandler, context) {
   }
 
   if (
-    typeof type === 'object' &&
-    type.$$typeof.toString() === 'Symbol(react.context)'
+    typeof type === "object" &&
+    type.$$typeof.toString() === "Symbol(react.context)"
   ) {
     const parentProvider =
       context._providers && context._providers.get(type._context.Provider);
@@ -94,6 +94,12 @@ function prepareElement(element, errorHandler, context) {
     return Promise.resolve([consumerFunc(value), context]);
   }
 
+  if (
+    typeof type === "object" &&
+    type.$$typeof.toString() === "Symbol(react.forward_ref)"
+  ) {
+    return Promise.resolve([props.children, context]);
+  }
   if (!isReactCompositeComponent(type)) {
     return Promise.resolve([type(props), context]);
   }
@@ -104,18 +110,18 @@ function prepare(element, options = {}, context = {}) {
   const {
     errorHandler = error => {
       throw error;
-    },
+    }
   } = options;
   return prepareElement(
     element,
     errorHandler,
-    context,
+    context
   ).then(([children, childContext]) =>
     Promise.all(
       React.Children
         .toArray(children)
-        .map(child => prepare(child, options, childContext)),
-    ),
+        .map(child => prepare(child, options, childContext))
+    )
   );
 }
 
