@@ -142,6 +142,21 @@ describe('prepare', () => {
     );
     t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
   });
+  it('Should support <React.Forwardref />', async () => {
+    const ParagraphWrapper = React.forwardRef((props, ref) => (
+      <p id="test" ref={ref}>{props.children}</p>
+    ));
+    const ref = React.createRef();
+    const App = () => (
+      <ParagraphWrapper ref={ref}>This is a test</ParagraphWrapper>
+    );
+    await prepare(App);
+    const html = renderToStaticMarkup(<App />);
+    t.assert(
+      html === '<p id="test">This is a test</p>',
+      'App should render with correct html',
+    );
+  });
 
   it('Should support <React.Fragment />', async () => {
     const doAsyncSideEffect = sinon.spy(async () => {});

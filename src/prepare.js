@@ -94,6 +94,12 @@ function prepareElement(element, errorHandler, context) {
     return Promise.resolve([consumerFunc(value), context]);
   }
 
+  if (
+    typeof type === 'object' &&
+    type.$$typeof.toString() === 'Symbol(react.forward_ref)'
+  ) {
+    return Promise.resolve([props.children, context]);
+  }
   if (!isReactCompositeComponent(type)) {
     return Promise.resolve([type(props), context]);
   }
