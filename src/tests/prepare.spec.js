@@ -143,17 +143,51 @@ describe('prepare', () => {
     t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
   });
   it('Should support <React.Forwardref />', async () => {
-    const ParagraphWrapper = React.forwardRef((props, ref) => (
-      <p id="test" ref={ref}>{props.children}</p>
+    const RefSetter = React.forwardRef((props, ref) => {
+      ref.current = 'hi';
+      return <p id="test">{props.children} - {ref.current}</p>;
+    });
+    const RefUserTester = sinon.spy((props, ref) => (
+      <p id="test2">{props.children} - {ref.current}</p>
     ));
-    const ref = React.createRef();
+    const RefUser = React.forwardRef(RefUserTester);
+    const refToSet = React.createRef();
+    const refToRead = React.createRef();
+    refToRead.current = 'data is correct';
+
     const App = () => (
-      <ParagraphWrapper ref={ref}>This is a test</ParagraphWrapper>
+      <React.Fragment>
+        <RefSetter ref={refToSet}>This is a ref setter test</RefSetter>
+        <RefUser ref={refToRead}>
+          This is a ref user test
+        </RefUser>
+      </React.Fragment>
     );
-    await prepare(App);
+    await prepare(<App />);
+
+    t.assert(
+      refToRead.current === 'data is correct',
+      'ref value should presist',
+    );
+    t.assert(refToSet.current === 'hi', 'ref value should be set');
+    t.assert(
+      RefUserTester.calledOnce,
+      'Should only be called once during prepare',
+    );
+    t.assert(
+      RefUserTester.calledOnce,
+      'Should only be called once during prepare',
+    );
+    t.assert(
+      equal(RefUserTester.getCall(0).args, [
+        { children: 'This is a ref user test' },
+        { current: 'data is correct' },
+      ]),
+    );
     const html = renderToStaticMarkup(<App />);
     t.assert(
-      html === '<p id="test">This is a test</p>',
+      html ===
+        '<p id="test">This is a ref setter test - hi</p><p id="test2">This is a ref user test - data is correct</p>',
       'App should render with correct html',
     );
   });
