@@ -2,7 +2,7 @@ import React from 'react';
 
 import isReactCompositeComponent from './utils/isReactCompositeComponent';
 import isThenable from './utils/isThenable';
-import { isPrepared, getPrepare } from './prepared';
+import { isPrepared, getPrepare, hasSsrDataDeps } from './prepared';
 
 const updater = {
   enqueueSetState(publicInstance, partialState, callback) {
@@ -47,18 +47,22 @@ function renderCompositeElementInstance(instance, context = {}) {
 }
 
 async function prepareCompositeElement({ type, props }, errorHandler, context) {
+  let preparedPromise;
+
   if (isPrepared(type)) {
     const p = getPrepare(type)(props, context);
     if (isThenable(p)) {
-      await p.catch(errorHandler);
-    } else {
-      await Promise.resolve();
+      preparedPromise = p.catch(errorHandler);
+      if (hasSsrDataDeps(type)) {
+        await preparedPromise;
+      }
     }
-  } else {
-    await Promise.resolve();
   }
   const instance = createCompositeElementInstance({ type, props }, context);
-  return renderCompositeElementInstance(instance, context);
+  return [
+    ...renderCompositeElementInstance(instance, context),
+    preparedPromise,
+  ];
 }
 
 function prepareElement(element, errorHandler, context) {
@@ -116,11 +120,13 @@ function prepare(element, options = {}, context = {}) {
     element,
     errorHandler,
     context,
-  ).then(([children, childContext]) =>
+  ).then(([children, childContext, p]) =>
     Promise.all(
       React.Children
         .toArray(children)
-        .map(child => prepare(child, options, childContext)),
+        .map(child => prepare(child, options, childContext))
+        .concat(p)
+        .filter(Boolean),
     ),
   );
 }
