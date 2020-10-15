@@ -113,6 +113,44 @@ describe('prepare', () => {
     t.assert(doAsyncSideEffect.calledThrice, 'Should be called 3 times');
   });
 
+  it('Should handle data deps properly in correct order', async () => {
+    const execOrder = [];
+
+    const innerFunc = () => execOrder.push('inner');
+    const outerFunc = () => execOrder.push('outer');
+
+    const outerPrepare = async () =>
+      new Promise(resolve => setTimeout(() => outerFunc() && resolve(), 0));
+    const innerPrepare = async () =>
+      new Promise(resolve => innerFunc() && resolve());
+
+    const Outer = prepared(outerPrepare)(
+      ({ text, children }) => (
+        <div>
+          {text} <div>{children ? children : null}</div>
+        </div>
+      ),
+      { hasSsrDataDeps: false },
+    );
+    const Inner = prepared(innerPrepare)(({ text, children }) => (
+      <div>
+        {text} <div>{children ? children : null}</div>
+      </div>
+    ));
+    await prepare(
+      <Outer text="foo">
+        <Inner text="foo">
+          <Inner text="foo" />
+          <Inner text="foo" />
+        </Inner>
+      </Outer>,
+    );
+    t.assert(
+      equal(execOrder, ['inner', 'inner', 'inner', 'outer']),
+      'outer should be resolved last',
+    );
+  });
+
   it("Should be possible to don't throw exception", async () => {
     const doAsyncSideEffect = sinon.spy(async () => {
       throw new Error('Errooor');

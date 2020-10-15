@@ -8,6 +8,7 @@ const prepared = (
     pure = true,
     componentDidMount = true,
     componentWillReceiveProps = true,
+    awaitOnSsr = true,
     contextTypes = {},
   } = {},
 ) => OriginalComponent => {
@@ -43,17 +44,30 @@ const prepared = (
       return <OriginalComponent {...this.props} />;
     }
   }
-  PreparedComponent[__REACT_PREPARE__] = prepare.bind(null);
+  PreparedComponent[__REACT_PREPARE__] = {
+    prepare: prepare.bind(null),
+    awaitOnSsr,
+  };
   return PreparedComponent;
 };
 
-function isPrepared(CustomComponent) {
-  return typeof CustomComponent[__REACT_PREPARE__] === 'function';
-}
-
 function getPrepare(CustomComponent) {
-  return CustomComponent[__REACT_PREPARE__];
+  return (
+    CustomComponent[__REACT_PREPARE__] &&
+    CustomComponent[__REACT_PREPARE__].prepare
+  );
 }
 
-export { isPrepared, getPrepare };
+function isPrepared(CustomComponent) {
+  return typeof getPrepare(CustomComponent) === 'function';
+}
+
+function shouldAwaitOnSsr(CustomComponent) {
+  return (
+    CustomComponent[__REACT_PREPARE__] &&
+    CustomComponent[__REACT_PREPARE__].awaitOnSsr
+  );
+}
+
+export { isPrepared, getPrepare, shouldAwaitOnSsr };
 export default prepared;
