@@ -105,6 +105,7 @@ Available `opts` is an optional configuration object:
 - `opts.pure` (default: `true`): the decorated component extends `PureComponent` instead of `Component`.
 - `opts.componentDidMount` (default: `true`): on the client, `sideEffect` is called when the component is mounted.
 - `opts.componentWillReceiveProps` (default: `true`): on the client, `sideEffect` is called again whenever the component receive props.
+- `opts.awaitOnSsr` (default: `true`): on the server, should `prepare` await `sideEffect` before traversing further down the tree. When `false` the promise will be awaited before `prepare` returns.
 
 #### `async prepare(Element, ?opts)`
 

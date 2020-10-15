@@ -8,12 +8,7 @@ const prepared = (
     pure = true,
     componentDidMount = true,
     componentWillReceiveProps = true,
-    /*
-    * Does this prepared func has to resolve before travelling further down the tree. If set to false
-    * the prepare function is executed but not awaited before traveling further down. It is awaited
-    * before prepare resolves, so the result will be ready to use when rendering the html.
-    */
-    hasSsrDataDeps: _hasSsrDataDeps = true,
+    awaitOnSsr = true,
     contextTypes = {},
   } = {},
 ) => OriginalComponent => {
@@ -51,14 +46,10 @@ const prepared = (
   }
   PreparedComponent[__REACT_PREPARE__] = {
     prepare: prepare.bind(null),
-    _hasSsrDataDeps,
+    awaitOnSsr,
   };
   return PreparedComponent;
 };
-
-function isPrepared(CustomComponent) {
-  return typeof getPrepare(CustomComponent) === 'function';
-}
 
 function getPrepare(CustomComponent) {
   return (
@@ -66,12 +57,17 @@ function getPrepare(CustomComponent) {
     CustomComponent[__REACT_PREPARE__].prepare
   );
 }
-function hasSsrDataDeps(CustomComponent) {
+
+function isPrepared(CustomComponent) {
+  return typeof getPrepare(CustomComponent) === 'function';
+}
+
+function shouldAwaitOnSsr(CustomComponent) {
   return (
     CustomComponent[__REACT_PREPARE__] &&
-    CustomComponent[__REACT_PREPARE__].hasSsrDataDeps
+    CustomComponent[__REACT_PREPARE__].awaitOnSsr
   );
 }
 
-export { isPrepared, getPrepare, hasSsrDataDeps };
+export { isPrepared, getPrepare, shouldAwaitOnSsr };
 export default prepared;

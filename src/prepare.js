@@ -2,7 +2,7 @@ import React from 'react';
 
 import isReactCompositeComponent from './utils/isReactCompositeComponent';
 import isThenable from './utils/isThenable';
-import { isPrepared, getPrepare, hasSsrDataDeps } from './prepared';
+import { isPrepared, getPrepare, shouldAwaitOnSsr } from './prepared';
 
 const updater = {
   enqueueSetState(publicInstance, partialState, callback) {
@@ -53,7 +53,7 @@ async function prepareCompositeElement({ type, props }, errorHandler, context) {
     const p = getPrepare(type)(props, context);
     if (isThenable(p)) {
       preparedPromise = p.catch(errorHandler);
-      if (hasSsrDataDeps(type)) {
+      if (shouldAwaitOnSsr(type)) {
         await preparedPromise;
       }
     }
