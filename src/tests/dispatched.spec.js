@@ -73,7 +73,7 @@ describe('dispatched', () => {
       const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
 
       // async action creator
-      const fetchInto = (pathname, into) => async dispatch => {
+      const fetchInto = (pathname, into) => async (dispatch) => {
         dispatch({
           type: FETCH_STARTED,
           into,
@@ -161,12 +161,20 @@ describe('dispatched', () => {
 
       const App = () => (
         <ul>
-          <li key="alpha"><EchoAlpha value="foo" /></li>
-          <li key="beta"><EchoBeta value="bar" /></li>
+          <li key="alpha">
+            <EchoAlpha value="foo" />
+          </li>
+          <li key="beta">
+            <EchoBeta value="bar" />
+          </li>
         </ul>
       );
 
-      const app = <Provider store={store}><App /></Provider>;
+      const app = (
+        <Provider store={store}>
+          <App />
+        </Provider>
+      );
 
       await prepare(app);
       const html = renderToStaticMarkup(app);

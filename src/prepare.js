@@ -6,9 +6,10 @@ import { isPrepared, getPrepare, shouldAwaitOnSsr } from './prepared';
 
 const updater = {
   enqueueSetState(publicInstance, partialState, callback) {
-    const newState = typeof partialState === 'function'
-      ? partialState(publicInstance.state, publicInstance.props)
-      : partialState;
+    const newState =
+      typeof partialState === 'function'
+        ? partialState(publicInstance.state, publicInstance.props)
+        : partialState;
 
     publicInstance.state = Object.assign({}, publicInstance.state, newState);
     if (typeof callback === 'function') {
@@ -112,22 +113,18 @@ function prepareElement(element, errorHandler, context) {
 
 function prepare(element, options = {}, context = {}) {
   const {
-    errorHandler = error => {
+    errorHandler = (error) => {
       throw error;
     },
   } = options;
-  return prepareElement(
-    element,
-    errorHandler,
-    context,
-  ).then(([children, childContext, p]) =>
-    Promise.all(
-      React.Children
-        .toArray(children)
-        .map(child => prepare(child, options, childContext))
-        .concat(p)
-        .filter(Boolean),
-    ),
+  return prepareElement(element, errorHandler, context).then(
+    ([children, childContext, p]) =>
+      Promise.all(
+        React.Children.toArray(children)
+          .map((child) => prepare(child, options, childContext))
+          .concat(p)
+          .filter(Boolean),
+      ),
   );
 }
 

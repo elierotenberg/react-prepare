@@ -96,7 +96,7 @@ describe('prepare', () => {
     const prepareUsingProps = async ({ text }) => {
       await doAsyncSideEffect(text);
     };
-    const options = { errorHandler: e => e };
+    const options = { errorHandler: (e) => e };
 
     const App = prepared(prepareUsingProps)(({ text, children }) => (
       <div>
@@ -120,9 +120,9 @@ describe('prepare', () => {
     const outerFunc = () => execOrder.push('outer');
 
     const outerPrepare = async () =>
-      new Promise(resolve => setTimeout(() => outerFunc() && resolve(), 0));
+      new Promise((resolve) => setTimeout(() => outerFunc() && resolve(), 0));
     const innerPrepare = async () =>
-      new Promise(resolve => innerFunc() && resolve());
+      new Promise((resolve) => innerFunc() && resolve());
 
     const Outer = prepared(outerPrepare)(
       ({ text, children }) => (
@@ -159,7 +159,7 @@ describe('prepare', () => {
     const prepareUsingProps = async ({ text }) => {
       await doAsyncSideEffect(text);
     };
-    const options = { errorHandler: e => e };
+    const options = { errorHandler: (e) => e };
 
     const App = prepared(prepareUsingProps)(({ text, children }) => (
       <div>
@@ -183,10 +183,16 @@ describe('prepare', () => {
   it('Should support <React.Forwardref />', async () => {
     const RefSetter = React.forwardRef((props, ref) => {
       ref.current = 'hi';
-      return <p id="test">{props.children} - {ref.current}</p>;
+      return (
+        <p id="test">
+          {props.children} - {ref.current}
+        </p>
+      );
     });
     const RefUserTester = sinon.spy((props, ref) => (
-      <p id="test2">{props.children} - {ref.current}</p>
+      <p id="test2">
+        {props.children} - {ref.current}
+      </p>
     ));
     const RefUser = React.forwardRef(RefUserTester);
     const refToSet = React.createRef();
@@ -196,9 +202,7 @@ describe('prepare', () => {
     const App = () => (
       <React.Fragment>
         <RefSetter ref={refToSet}>This is a ref setter test</RefSetter>
-        <RefUser ref={refToRead}>
-          This is a ref user test
-        </RefUser>
+        <RefUser ref={refToRead}>This is a ref user test</RefUser>
       </React.Fragment>
     );
     await prepare(<App />);
@@ -261,26 +265,24 @@ describe('prepare', () => {
     const AnotherContext = React.createContext();
     const App = () => (
       <MyContext.Consumer>
-        {data => (
+        {(data) => (
           <React.Fragment>
             {data}{' '}
             <MyContext.Provider value="testing">
+              <MyContext.Consumer>{Func}</MyContext.Consumer>
               <MyContext.Consumer>
-                {Func}
-              </MyContext.Consumer>
-              <MyContext.Consumer>
-                {internal => <React.Fragment>{internal}{' '}</React.Fragment>}
+                {(internal) => <React.Fragment>{internal} </React.Fragment>}
               </MyContext.Consumer>
             </MyContext.Provider>
             <MyContext.Consumer>
-              {internal => <React.Fragment>{internal}{' '}</React.Fragment>}
+              {(internal) => <React.Fragment>{internal} </React.Fragment>}
             </MyContext.Consumer>
             <AnotherContext.Consumer>
-              {internal => <React.Fragment>{internal}</React.Fragment>}
+              {(internal) => <React.Fragment>{internal}</React.Fragment>}
             </AnotherContext.Consumer>
             <AnotherContext.Provider value="another">
               <AnotherContext.Consumer>
-                {internal => <React.Fragment>{internal}</React.Fragment>}
+                {(internal) => <React.Fragment>{internal}</React.Fragment>}
               </AnotherContext.Consumer>
             </AnotherContext.Provider>
           </React.Fragment>
@@ -347,9 +349,9 @@ describe('prepare', () => {
     const FirstChild = prepared(prepareUsingPropsForFirstChild)(({ text }) => (
       <span className={classNameOfFirstChild}>{text}</span>
     ));
-    const SecondChild = prepared(
-      prepareUsingPropsForSecondChild,
-    )(({ text }) => <span className={classNameOfSecondChild}>{text}</span>);
+    const SecondChild = prepared(prepareUsingPropsForSecondChild)(
+      ({ text }) => <span className={classNameOfSecondChild}>{text}</span>,
+    );
 
     const App = ({ texts }) => (
       <ul>
