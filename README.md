@@ -48,9 +48,11 @@ import reducer from './reducer';
 
 async function serverSideRender(userName) {
   const store = createStore(reducer, applyMiddleware(thunkMiddleware));
-  const app = <Provider store={store}>
-    <TodoList userName={userName} />
-  </Provider>;
+  const app = (
+    <Provider store={store}>
+      <TodoList userName={userName} />
+    </Provider>
+  );
   await prepare(app);
   return {
     html: renderToString(app),
@@ -63,9 +65,12 @@ Your client could re-use the data fetched during server-side rendering directly,
 
 ```js
 const store = createStore(reducer, JSON.parse(window.__APP_STATE__));
-render(<Provider store={store}>
-  <TodoList userName={userName} />
-</Provider>, document.getElementById('app'));
+render(
+  <Provider store={store}>
+    <TodoList userName={userName} />
+  </Provider>,
+  document.getElementById('app'),
+);
 ```
 
 **For a complete example of a fully-functional app using `react-prepare` in conjunction with `redux`, see the [react-prepare-todo](https://github.com/elierotenberg/react-prepare-todo) repository.**
@@ -110,14 +115,14 @@ Available `opts` is an optional configuration object:
 #### `async prepare(Element, ?opts)`
 
 Recursively traverses the element rendering tree and awaits the side effects of components decorated with `prepared` (or `dispatched`).
-It should be used (and `await`-ed) *before* calling `renderToString` on the server. If any of the side effects throws, `prepare` will also throw.
+It should be used (and `await`-ed) _before_ calling `renderToString` on the server. If any of the side effects throws, `prepare` will also throw.
 
 `opts` is an optional configuration object.
 
 Available `opts` is an optional configuration object:
 
 - `opts.errorHandler` (default: `e => {throw e}`): Custom error handler used by each `sideEffect`. If a `sideEffect` throws, this is used as an error handler. If
-the error handler then throws, the `prepare`.
+  the error handler then throws, the `prepare`.
 
 ### Notes
 
