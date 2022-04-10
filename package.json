@@ -9,7 +9,7 @@
     "build": "node_modules/.bin/babel src -d dist --source-maps",
     "test": "node_modules/.bin/mocha --compilers js:babel-register src/**/*.spec.js",
     "make": "yarn run lint && yarn run clean && yarn run build && yarn run test",
-    "prettier": "prettier \"src/**/*.js\" --write --single-quote --trailing-comma=all"
+    "prettier": "prettier \"src/**/*.js\" --write"
   },
   "repository": {
     "url": "git@github.com:elierotenberg/react-prepare",
